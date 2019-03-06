@@ -1,0 +1,63 @@
+#coding=utf-8
+import sys
+import os
+base_path = os.path.abspath('..') + '\\util'
+sys.path.append(base_path)
+sys.path.append('..')
+from common.webdriver_util import WebdriverUtil
+from util.find_element import FindElement
+from selenium.webdriver import ActionChains
+from time import sleep
+class CustomHandle:
+	def __init__(self,driver):
+		self.fd = FindElement(driver,'../config/LocalElement.ini')
+		self.util = WebdriverUtil()
+		self.driver = driver
+
+	def toCustom(self):
+		#点击"我的客户"
+		ActionChains(self.driver).move_to_element(self.fd.get_element('custom','custom')).perform()
+		self.fd.get_element('custom','myCustom').click()
+		return driver
+
+	def clickAdd(self):
+		driver = self.toCustom()
+		#切换到主Frame
+		self.util.switchFrame(driver,'frame','mainframe')
+		#点击新增按钮
+		oldHandle = driver.current_window_handle
+		self.fd.get_element('custom','add').click()
+		#切换到新弹出的"新增客户"页面
+		allHandle = driver.window_handles
+		self.util.switchWindow(driver,oldHandle,allHandle)
+		return driver
+
+	def addCustom(self,username,notnull):
+		driver = self.clickAdd()
+		#输入姓名、必填项，点击确定 ,username,notnull
+		self.fd.get_element('custom','customName').send_keys(username)
+		self.fd.get_element('custom','notNullText').send_keys(notnull)
+		self.fd.get_element('custom','save').click()
+
+	def getFirstCustom(self):
+		return self.fd.get_element('custom','fistCustom').text
+
+	def getSecondCustom(self):
+		return self.fd.get_element('custom','secondCustom').text
+		
+		
+		
+
+
+
+		
+
+if __name__ == '__main__':
+	from common.common_util import CommonUtil
+
+	driver = CommonUtil().login()
+	a = CustomHandle(driver)
+	a.clickAdd()
+	#CustomHandle(driver).addCustom('卡尔玛','1')
+
+	
